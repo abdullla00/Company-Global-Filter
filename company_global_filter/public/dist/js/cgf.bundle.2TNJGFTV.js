@@ -214,12 +214,10 @@
       renderList(companies);
       searchInput.addEventListener("input", () => {
         const value = searchInput.value.toLowerCase();
-        const filtered = companies.filter(
-          (name) => name.toLowerCase().includes(value)
-        );
+        const filtered = companies.filter((name) => name.toLowerCase().includes(value));
         renderList(filtered);
       });
     });
   });
 })();
-//# sourceMappingURL=cgf.bundle.R4UGYUW3.js.map
+//# sourceMappingURL=cgf.bundle.2TNJGFTV.js.map

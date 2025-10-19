@@ -167,61 +167,62 @@ frappe.templates.navbar = `
   `;
 
 frappe.after_ajax(() => {
-	frappe.call('company_global_filter.hook_functions.global_company_filter.get_company_list').then(r => {
-		const companies = r.message || [];
-		const container = document.getElementById("company-list");
-		const searchInput = document.getElementById("company-search");
+	frappe
+		.call("company_global_filter.hook_functions.global_company_filter.get_company_list")
+		.then((r) => {
+			const companies = r.message || [];
+			const container = document.getElementById("company-list");
+			const searchInput = document.getElementById("company-search");
 
-		if (!container || !searchInput) return;
+			if (!container || !searchInput) return;
 
-		function renderList(filteredCompanies) {
-			container.innerHTML = '';
+			function renderList(filteredCompanies) {
+				container.innerHTML = "";
 
-			if (!filteredCompanies.length) {
-				container.innerHTML = '<div class="text-muted small px-2 py-1">No matching companies</div>';
-				return;
+				if (!filteredCompanies.length) {
+					container.innerHTML =
+						'<div class="text-muted small px-2 py-1">No matching companies</div>';
+					return;
+				}
+
+				filteredCompanies.forEach((company_name) => {
+					const btn = document.createElement("button");
+					btn.className = "btn-reset dropdown-item";
+					btn.textContent = company_name;
+					btn.onclick = () => {
+						frappe.call({
+							method: "frappe.core.doctype.session_default_settings.session_default_settings.set_session_default_values",
+							args: {
+								default_values: { company: company_name },
+							},
+							callback: function (data2) {
+								if (data2.message == "success") {
+									frappe.show_alert({
+										message: __("Session Defaults Saved"),
+										indicator: "green",
+									});
+									frappe.ui.toolbar.clear_cache();
+								} else {
+									frappe.show_alert({
+										message: __(
+											"An error occurred while setting Session Defaults"
+										),
+										indicator: "red",
+									});
+								}
+							},
+						});
+					};
+					container.appendChild(btn);
+				});
 			}
 
-			filteredCompanies.forEach(company_name => {
-				const btn = document.createElement('button');
-				btn.className = 'btn-reset dropdown-item';
-				btn.textContent = company_name;
-				btn.onclick = () => {
-					frappe.call({
-					method: "frappe.core.doctype.session_default_settings.session_default_settings.set_session_default_values",
-					args: {
-						default_values: {company: company_name}
-					},
-					callback: function (data2) {
-						if (data2.message == "success") {
-							frappe.show_alert({
-								message: __("Session Defaults Saved"),
-								indicator: "green"
-							});
-							frappe.ui.toolbar.clear_cache();
-						} else {
-							frappe.show_alert({
-								message: __(
-									"An error occurred while setting Session Defaults"
-								),
-								indicator: "red"
-							});
-						}
-					}
-				});
-				};
-				container.appendChild(btn);
+			renderList(companies);
+
+			searchInput.addEventListener("input", () => {
+				const value = searchInput.value.toLowerCase();
+				const filtered = companies.filter((name) => name.toLowerCase().includes(value));
+				renderList(filtered);
 			});
-		}
-
-		renderList(companies);
-
-		searchInput.addEventListener("input", () => {
-			const value = searchInput.value.toLowerCase();
-			const filtered = companies.filter(name =>
-				name.toLowerCase().includes(value)
-			);
-			renderList(filtered);
 		});
-	});
 });
