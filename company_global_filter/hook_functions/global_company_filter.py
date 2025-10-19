@@ -60,7 +60,7 @@ def get_permission_query_conditions(user, doctype=None):
 
 		return condition
 
-	except Exception as e:
+	except Exception:
 		# Don't raise errors during permission queries to avoid boot failures
 		return ""
 
@@ -99,7 +99,7 @@ def get_user_company():
 
 		return None
 
-	except Exception as e:
+	except Exception:
 		# Don't raise errors during session boot
 		return None
 
@@ -121,7 +121,7 @@ def get_company_field_name(doctype):
 
 		return None
 
-	except Exception as e:
+	except Exception:
 		# Don't raise errors during permission queries
 		return None
 
@@ -139,7 +139,7 @@ def set_selected_company(company):
 
 		return {"status": "error", "message": "Invalid company"}
 
-	except Exception as e:
+	except Exception:
 		return {"status": "error", "message": "Error setting company"}
 
 
@@ -153,7 +153,7 @@ def get_selected_company():
 																					  'defaults') else None,
 			"current_company": get_user_company()
 		}
-	except Exception as e:
+	except Exception:
 		return {
 			"selected_company": None,
 			"default_company": None,
@@ -169,5 +169,5 @@ def clear_selected_company():
 			del frappe.session['selected_company']
 			frappe.db.commit()
 		return {"status": "success", "message": "Company filter cleared"}
-	except Exception as e:
+	except Exception:
 		return {"status": "error", "message": "Error clearing company filter"}
