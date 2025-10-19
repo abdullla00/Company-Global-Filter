@@ -95,8 +95,8 @@ def search_link(doctype=None, txt=None, query=None, filters=None, page_length=20
             reference_doctype=reference_doctype,
             ignore_user_permissions=ignore_user_permissions
         )
-    except Exception as e:
-        frappe.log_error(f"Error in search_link: {str(e)}", "Search Link Error")
+    except Exception:
+        frappe.log_error(f"Error in search_link", "Search Link Error")
         return frappe_search_link(
             doctype=doctype,
             txt=txt,
