@@ -6,7 +6,7 @@ from frappe.desk.search import search_link
 @frappe.whitelist()
 def get_company_list():
 	companies = search_link(txt="", doctype="Company", reference_doctype="", page_length=100000)
-	company_names = [c.get('value') for c in companies]
+	company_names = [c.get("value") for c in companies]
 	return company_names
 
 
@@ -22,24 +22,48 @@ def get_permission_query_conditions(user, doctype=None):
 
 		# Skip system/core doctypes to avoid boot issues
 		system_doctypes = [
-			'User', 'Role', 'DocType', 'DocField', 'DocPerm', 'Print Format',
-			'Page', 'Report', 'Module Def', 'Desktop Icon', 'Workspace',
-			'Dashboard', 'Number Card', 'Dashboard Chart', 'Session Default',
-			'System Settings', 'Error Log', 'Activity Log', 'Email Queue',
-			'Communication', 'Comment', 'File', 'Version', 'Translation',
-			'Language', 'Letter Head', 'Email Template', 'Print Settings',
-			'Customize Form', 'Property Setter', 'Custom Field'
+			"User",
+			"Role",
+			"DocType",
+			"DocField",
+			"DocPerm",
+			"Print Format",
+			"Page",
+			"Report",
+			"Module Def",
+			"Desktop Icon",
+			"Workspace",
+			"Dashboard",
+			"Number Card",
+			"Dashboard Chart",
+			"Session Default",
+			"System Settings",
+			"Error Log",
+			"Activity Log",
+			"Email Queue",
+			"Communication",
+			"Comment",
+			"File",
+			"Version",
+			"Translation",
+			"Language",
+			"Letter Head",
+			"Email Template",
+			"Print Settings",
+			"Customize Form",
+			"Property Setter",
+			"Custom Field",
 		]
 
 		if doctype in system_doctypes:
 			return ""
 
 		# Check if session is available (avoid boot errors)
-		if not hasattr(frappe, 'session') or not frappe.session:
+		if not hasattr(frappe, "session") or not frappe.session:
 			return ""
 
 		# Check if database is available
-		if not hasattr(frappe, 'db') or not frappe.db:
+		if not hasattr(frappe, "db") or not frappe.db:
 			return ""
 
 		# Get user's selected/default company
@@ -69,17 +93,17 @@ def get_user_company():
 	"""Get user's selected company from session or default"""
 	try:
 		# Check if session is available
-		if not hasattr(frappe, 'session') or not frappe.session:
+		if not hasattr(frappe, "session") or not frappe.session:
 			return None
 
 		# First check if user has selected a company in session
-		selected_company = frappe.session.get('selected_company')
+		selected_company = frappe.session.get("selected_company")
 
 		if selected_company:
 			return selected_company
 
 		# Check if defaults module is available
-		if not hasattr(frappe, 'defaults'):
+		if not hasattr(frappe, "defaults"):
 			return None
 
 		# Fallback to user's default company
@@ -89,10 +113,8 @@ def get_user_company():
 			return default_company
 
 		# If no default, get first available company user has access to
-		if hasattr(frappe, 'get_list'):
-			companies = frappe.get_list('Company',
-										fields=['name'],
-										limit=1)
+		if hasattr(frappe, "get_list"):
+			companies = frappe.get_list("Company", fields=["name"], limit=1)
 
 			if companies:
 				return companies[0].name
@@ -108,15 +130,15 @@ def get_company_field_name(doctype):
 	"""Check if doctype has a company field and return the field name"""
 	try:
 		# Check if get_meta is available
-		if not hasattr(frappe, 'get_meta'):
+		if not hasattr(frappe, "get_meta"):
 			return None
 
 		meta = frappe.get_meta(doctype)
 
 		# Check if doctype has company field (either 'company' or 'custom_company')
 		for field in meta.fields:
-			if field.fieldname in ['company', 'custom_company'] and field.fieldtype == 'Link':
-				if field.options == 'Company':  # Make sure it links to Company doctype
+			if field.fieldname in ["company", "custom_company"] and field.fieldtype == "Link":
+				if field.options == "Company":  # Make sure it links to Company doctype
 					return field.fieldname
 
 		return None
@@ -132,8 +154,8 @@ def set_selected_company(company):
 	try:
 		if company:
 			# Validate company exists and user has access
-			if frappe.db.exists('Company', company):
-				frappe.session['selected_company'] = company
+			if frappe.db.exists("Company", company):
+				frappe.session["selected_company"] = company
 				frappe.db.commit()
 				return {"status": "success", "company": company}
 
@@ -148,25 +170,22 @@ def get_selected_company():
 	"""Get user's currently selected company"""
 	try:
 		return {
-			"selected_company": frappe.session.get('selected_company') if frappe.session else None,
-			"default_company": frappe.defaults.get_user_default("Company") if hasattr(frappe,
-																					  'defaults') else None,
-			"current_company": get_user_company()
+			"selected_company": frappe.session.get("selected_company") if frappe.session else None,
+			"default_company": frappe.defaults.get_user_default("Company")
+			if hasattr(frappe, "defaults")
+			else None,
+			"current_company": get_user_company(),
 		}
 	except Exception:
-		return {
-			"selected_company": None,
-			"default_company": None,
-			"current_company": None
-		}
+		return {"selected_company": None, "default_company": None, "current_company": None}
 
 
 @frappe.whitelist()
 def clear_selected_company():
 	"""Clear user's selected company from session"""
 	try:
-		if frappe.session and 'selected_company' in frappe.session:
-			del frappe.session['selected_company']
+		if frappe.session and "selected_company" in frappe.session:
+			del frappe.session["selected_company"]
 			frappe.db.commit()
 		return {"status": "success", "message": "Company filter cleared"}
 	except Exception:
