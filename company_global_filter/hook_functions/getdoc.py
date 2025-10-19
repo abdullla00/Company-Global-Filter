@@ -54,6 +54,6 @@ def getdoc(doctype, name, user=None, for_edit=False):
         # Re-raise permission errors
         raise
     except Exception:
-        frappe.log_error(f"Error in getdoc", "GetDoc Error")
+        frappe.log_error("Error in getdoc", "GetDoc Error")
         # Fallback to original getdoc on any other error
         return frappe_getdoc(doctype, name)
