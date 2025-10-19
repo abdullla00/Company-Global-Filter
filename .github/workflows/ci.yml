@@ -8,7 +8,7 @@ on:
   pull_request:
 
 concurrency:
-  group: main-erpnext_australian_localisation-${{ github.event.number }}
+  group: main-company_global_filter-${{ github.event.number }}
   cancel-in-progress: true
 
 jobs:
