@@ -1,7 +1,7 @@
 app_name = "company_global_filter"
 app_title = "Company Global Filter"
 app_publisher = "Invento Software Limited"
-app_description = "na"
+app_description = "Company Global Filter automatically applies company-level filters across all doctypes in ERPNext that have a company or custom_company field. This ensures that users only see records relevant to their company, simplifying multi-company management and improving data security and usability."
 app_email = "munim@invento.com.bd"
 app_license = "mit"
 
@@ -11,22 +11,22 @@ app_license = "mit"
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "company_global_filter",
-# 		"logo": "/assets/company_global_filter/logo.png",
-# 		"title": "Company Global Filter",
-# 		"route": "/company_global_filter",
-# 		"has_permission": "company_global_filter.api.permission.has_app_permission"
-# 	}
-# ]
+add_to_apps_screen = [
+	{
+		"name": "company_global_filter",
+		"logo": "/assets/company_global_filter/logo.png",
+		"title": "Company Global Filter",
+		# "route": "/company_global_filter",
+		# "has_permission": "company_global_filter.api.permission.has_app_permission"
+	}
+]
 
 # Includes in <head>
 # ------------------
 
 # include js, css files in header of desk.html
-# app_include_css = "/assets/company_global_filter/css/company_global_filter.css"
-# app_include_js = "/assets/company_global_filter/js/company_global_filter.js"
+app_include_js = "cgf.bundle.js"
+# app_include_css = "/assets/company_global_filter/js/company_global_filter.css"
 
 # include js, css files in header of web template
 # web_include_css = "/assets/company_global_filter/css/company_global_filter.css"
@@ -117,9 +117,9 @@ app_license = "mit"
 # -----------
 # Permissions evaluated in scripted ways
 
-# permission_query_conditions = {
-# 	"Event": "frappe.desk.doctype.event.event.get_permission_query_conditions",
-# }
+permission_query_conditions = {
+	"*": "company_global_filter.hook_functions.global_company_filter.get_permission_query_conditions",
+}
 #
 # has_permission = {
 # 	"Event": "frappe.desk.doctype.event.event.has_permission",
@@ -174,9 +174,10 @@ app_license = "mit"
 # Overriding Methods
 # ------------------------------
 #
-# override_whitelisted_methods = {
-# 	"frappe.desk.doctype.event.event.get_events": "company_global_filter.event.get_events"
-# }
+override_whitelisted_methods = {
+	"frappe.desk.search.search_link": "company_global_filter.hook_functions.search_link.search_link",
+	"frappe.desk.form.load.getdoc": "company_global_filter.hook_functions.getdoc.getdoc",
+}
 #
 # each overriding function accepts a `data` argument;
 # generated from the base implementation of the doctype dashboard,
