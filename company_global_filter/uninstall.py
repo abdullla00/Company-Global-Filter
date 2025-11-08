@@ -16,6 +16,7 @@ from company_global_filter.constants import (
     CACHE_KEY_COMPANY_FIELD,
     CACHE_KEY_COMPANY_FIELD_NAME,
     CACHE_KEY_FIRST_SECTION_FIELD,
+    COMPANY_FIELD_DESCRIPTION,
     CUSTOM_COMPANY_FIELD_NAME,
     LOG_CATEGORY_ERROR,
     LOG_CATEGORY_UNINSTALL,
@@ -114,6 +115,7 @@ def before_uninstall() -> Dict[str, int]:
         verified_count = 0
 
         # Delete custom company fields
+        # First, delete fields from the known doctypes list
         for doctype in doctypes:
             field_name = f"{doctype}-{CUSTOM_COMPANY_FIELD_NAME}"
 
@@ -166,6 +168,35 @@ def before_uninstall() -> Dict[str, int]:
                     LOG_CATEGORY_ERROR,
                 )
                 # Continue with other fields even if one fails
+        
+        # Additional cleanup: Delete any remaining custom_company fields with our description
+        # This catches fields that might have been created manually or from previous versions
+        try:
+            remaining_fields = frappe.db.sql("""
+                SELECT name, dt
+                FROM `tabCustom Field`
+                WHERE fieldname = %s
+                AND description = %s
+            """, (CUSTOM_COMPANY_FIELD_NAME, COMPANY_FIELD_DESCRIPTION), as_dict=True)
+            
+            if remaining_fields:
+                logger.info(f"Found {len(remaining_fields)} additional custom_company fields to clean up")
+                for field in remaining_fields:
+                    try:
+                        if frappe.db.exists("Custom Field", field.name):
+                            frappe.delete_doc("Custom Field", field.name, force=True)
+                            frappe.db.commit()
+                            deleted_count += 1
+                            verified_count += 1
+                            logger.info(f"Deleted additional custom_company field: {field.name} (DT: {field.dt})")
+                            # Clear cache
+                            frappe.clear_cache(doctype=field.dt)
+                    except Exception as e:
+                        error_count += 1
+                        logger.warning(f"Error deleting additional field {field.name}: {str(e)}")
+        except Exception as e:
+            logger.warning(f"Error during additional cleanup: {str(e)}")
+            # Don't fail uninstall if additional cleanup fails
 
         # Note: Child table DocTypes are NOT explicitly deleted here.
         # Frappe automatically deletes all DocTypes in the app's modules during uninstall.
