@@ -224,8 +224,10 @@ def get_first_section_last_field(doctype: str) -> Optional[str]:
 
     Logic:
     1. Skip any initial Tab Breaks/Section Breaks to find the first actual section
-    2. Find the first Section Break (or end of first tab) to define the first section
-    3. Return the last regular field in that section (excluding custom_company field itself)
+    2. Once we encounter the first non-break field, start tracking
+    3. Track the last visible, non-layout field (excluding custom_company)
+    4. When we encounter the first Section Break, return the last tracked field
+    5. If no Section Break is found in first tab, return the last field before Tab Break or end
     
     Args:
         doctype: Name of the doctype to analyze
@@ -239,76 +241,79 @@ def get_first_section_last_field(doctype: str) -> Optional[str]:
     # Check cache first
     cache_key = CACHE_KEY_FIRST_SECTION_FIELD.format(doctype=doctype)
     cached_result = frappe.cache().get(cache_key)
-    if cached_result is not None:
+    # Only use cache if it's a valid string (not None, not empty)
+    if cached_result is not None and isinstance(cached_result, str) and cached_result:
         return cached_result
 
     try:
         meta = frappe.get_meta(doctype)
-
         last_field = None
-        found_first_tab = False
-        found_first_section = False
-        skipped_initial_breaks = False
+        in_first_section = False
+        logger = frappe.logger("company_global_filter", allow_site=True)
 
         for field in meta.fields:
-            # Skip the custom_company field itself if it exists
+            # Skip custom_company field itself
             if field.fieldname == CUSTOM_COMPANY_FIELD_NAME:
                 continue
 
-            # Skip initial Tab Breaks and Section Breaks to find the first actual section
+            # Handle Tab/Section Breaks
             if field.fieldtype in ["Tab Break", "Section Break"]:
-                if not skipped_initial_breaks:
+                if not in_first_section:
                     # Still skipping initial breaks, continue
                     continue
-                elif field.fieldtype == "Tab Break":
-                    # We've left the first tab, return what we found
-                    result = last_field
-                    # Cache the result
-                    frappe.cache().set(cache_key, result, expires_in_sec=CACHE_TTL)
-                    return result
                 elif field.fieldtype == "Section Break":
-                    if not found_first_section:
-                        # This is the first Section Break after initial breaks, return the last field before it
-                        found_first_section = True
-                        result = last_field
-                        # Cache the result
-                        frappe.cache().set(cache_key, result, expires_in_sec=CACHE_TTL)
-                        return result
-                    else:
-                        # We've left the first section, return what we found
-                        result = last_field
-                        # Cache the result
-                        frappe.cache().set(cache_key, result, expires_in_sec=CACHE_TTL)
-                        return result
+                    # Found first Section Break, return last field
+                    result = last_field
+                    # Cache the result (only if valid)
+                    if result:
+                        try:
+                            frappe.cache().set(cache_key, result, expires_in_sec=CACHE_TTL)
+                        except Exception:
+                            # Cache failure shouldn't prevent returning the result
+                            pass
+                    return result
+                elif field.fieldtype == "Tab Break":
+                    # Left first tab, return last field
+                    result = last_field
+                    # Cache the result (only if valid)
+                    if result:
+                        try:
+                            frappe.cache().set(cache_key, result, expires_in_sec=CACHE_TTL)
+                        except Exception:
+                            # Cache failure shouldn't prevent returning the result
+                            pass
+                    return result
 
-            # Mark that we've passed initial breaks and entered the first section
-            if not skipped_initial_breaks:
-                skipped_initial_breaks = True
-                found_first_tab = True
-
-            # Skip hidden fields and other layout-only fields
+            # Skip hidden and layout fields (but don't mark as in_first_section yet)
             if field.hidden or field.fieldtype in LAYOUT_FIELD_TYPES:
                 continue
 
-            # This is a regular field in the first section of the first tab
-            # Update last_field to track the most recent field
-            last_field = field.fieldname
+            # Mark that we've entered the first section (first visible, non-layout field)
+            if not in_first_section:
+                in_first_section = True
 
-        # Return the last field found, or None if no fields in first section
+            # Track this field as the last field in first section
+            last_field = field.fieldname
+            logger.debug(f"{doctype}: Tracking field '{field.fieldname}' as last_field in first section")
+
+        # Return last field found (if no Section Break encountered)
         result = last_field
-        # Cache the result (even if None)
-        frappe.cache().set(cache_key, result, expires_in_sec=CACHE_TTL)
+        logger.debug(f"{doctype}: Returning last_field = {result} (no Section Break encountered)")
+        # Cache the result (only if valid, not None)
+        if result:
+            try:
+                frappe.cache().set(cache_key, result, expires_in_sec=CACHE_TTL)
+            except Exception:
+                # Cache failure shouldn't prevent returning the result
+                pass
         return result
 
     except Exception as e:
         logger = frappe.logger("company_global_filter", allow_site=True)
-        logger.warning(
-            f"Error finding first section last field for {doctype}: {str(e)}", exc_info=True
-        )
-        frappe.log_error(
-            f"Error finding first section last field for {doctype}: {str(e)}",
-            LOG_CATEGORY_INSTALL,
-        )
+        error_msg = f"Error finding first section last field for {doctype}: {str(e)}"
+        logger.warning(error_msg, exc_info=True)
+        frappe.log_error(error_msg, LOG_CATEGORY_INSTALL)
+        # Don't cache None on error - allow retry
         return None
 
 

@@ -90,7 +90,7 @@ after_migrate = "company_global_filter.install.after_install"
 # ------------
 
 before_uninstall = "company_global_filter.uninstall.before_uninstall"
-# after_uninstall = "company_global_filter.uninstall.after_uninstall"
+after_uninstall = "company_global_filter.uninstall.after_uninstall"
 
 # Integration Setup
 # ------------------
