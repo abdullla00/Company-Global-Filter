@@ -12,13 +12,13 @@ app_license = "mit"
 
 # Each item in the list will be shown as an app in the apps page
 add_to_apps_screen = [
-	{
-		"name": "company_global_filter",
-		"logo": "/assets/company_global_filter/logo.png",
-		"title": "Company Global Filter",
-		# "route": "/company_global_filter",
-		# "has_permission": "company_global_filter.api.permission.has_app_permission"
-	}
+    {
+        "name": "company_global_filter",
+        "logo": "/assets/company_global_filter/logo.png",
+        "title": "Company Global Filter",
+        # "route": "/company_global_filter",
+        # "has_permission": "company_global_filter.api.permission.has_app_permission"
+    }
 ]
 
 # Includes in <head>
@@ -83,12 +83,13 @@ app_include_js = "cgf.bundle.js"
 # ------------
 
 # before_install = "company_global_filter.install.before_install"
-# after_install = "company_global_filter.install.after_install"
+after_install = "company_global_filter.install.after_install"
+after_migrate = "company_global_filter.install.after_install"
 
 # Uninstallation
 # ------------
 
-# before_uninstall = "company_global_filter.uninstall.before_uninstall"
+before_uninstall = "company_global_filter.uninstall.before_uninstall"
 # after_uninstall = "company_global_filter.uninstall.after_uninstall"
 
 # Integration Setup
@@ -118,7 +119,7 @@ app_include_js = "cgf.bundle.js"
 # Permissions evaluated in scripted ways
 
 permission_query_conditions = {
-	"*": "company_global_filter.hook_functions.global_company_filter.get_permission_query_conditions",
+    "*": "company_global_filter.hook_functions.global_company_filter.get_permission_query_conditions",
 }
 #
 # has_permission = {
@@ -175,8 +176,8 @@ permission_query_conditions = {
 # ------------------------------
 #
 override_whitelisted_methods = {
-	"frappe.desk.search.search_link": "company_global_filter.hook_functions.search_link.search_link",
-	"frappe.desk.form.load.getdoc": "company_global_filter.hook_functions.getdoc.getdoc",
+    "frappe.desk.search.search_link": "company_global_filter.hook_functions.search_link.search_link",
+    "frappe.desk.form.load.getdoc": "company_global_filter.hook_functions.getdoc.getdoc",
 }
 #
 # each overriding function accepts a `data` argument;

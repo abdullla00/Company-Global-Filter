@@ -1,0 +1,174 @@
+{
+  "actions": [],
+  "creation": "2025-01-15 12:00:00",
+  "doctype": "DocType",
+  "document_type": "System",
+  "engine": "InnoDB",
+  "field_order": [
+    "general_settings_section",
+    "enable_company_filtering",
+    "auto_create_fields",
+    "column_break_1",
+    "field_placement",
+    "excluded_doctypes_section",
+    "excluded_doctypes",
+    "excluded_users_roles_section",
+    "excluded_roles",
+    "excluded_users",
+    "excluded_companies_section",
+    "excluded_companies",
+    "per_doctype_excluded_companies",
+    "advanced_section",
+    "bypass_for_system_manager",
+    "enable_audit_logging",
+    "cache_ttl",
+    "documentation_section",
+    "setup_instructions"
+  ],
+  "fields": [
+    {
+      "fieldname": "general_settings_section",
+      "fieldtype": "Section Break",
+      "label": "General Settings"
+    },
+    {
+      "default": "1",
+      "description": "Enable global company filtering for all doctypes with company fields",
+      "fieldname": "enable_company_filtering",
+      "fieldtype": "Check",
+      "in_list_view": 1,
+      "label": "Enable Company Filtering"
+    },
+    {
+      "default": "1",
+      "description": "Automatically create custom_company fields for shared master doctypes during installation",
+      "fieldname": "auto_create_fields",
+      "fieldtype": "Check",
+      "label": "Auto Create Fields"
+    },
+    {
+      "fieldname": "column_break_1",
+      "fieldtype": "Column Break"
+    },
+    {
+      "default": "First Section",
+      "description": "Where to place custom_company fields in doctype forms",
+      "fieldname": "field_placement",
+      "fieldtype": "Select",
+      "label": "Field Placement",
+      "options": "First Section\nAppend to Form"
+    },
+    {
+      "fieldname": "excluded_doctypes_section",
+      "fieldtype": "Section Break",
+      "label": "Excluded DocTypes"
+    },
+    {
+      "description": "DocTypes that should not be filtered by company",
+      "fieldname": "excluded_doctypes",
+      "fieldtype": "Table",
+      "label": "Excluded DocTypes",
+      "options": "CGF Excluded DocType"
+    },
+    {
+      "fieldname": "excluded_users_roles_section",
+      "fieldtype": "Section Break",
+      "label": "Excluded Users & Roles"
+    },
+    {
+      "description": "Roles that can bypass company filtering",
+      "fieldname": "excluded_roles",
+      "fieldtype": "Table",
+      "label": "Excluded Roles",
+      "options": "CGF Excluded Role"
+    },
+    {
+      "description": "Users that can bypass company filtering",
+      "fieldname": "excluded_users",
+      "fieldtype": "Table",
+      "label": "Excluded Users",
+      "options": "CGF Excluded User"
+    },
+    {
+      "fieldname": "excluded_companies_section",
+      "fieldtype": "Section Break",
+      "label": "Excluded Companies"
+    },
+    {
+      "description": "Companies whose documents are visible to specific users/roles, bypassing company filter",
+      "fieldname": "excluded_companies",
+      "fieldtype": "Table",
+      "label": "Excluded Companies",
+      "options": "CGF Excluded Company"
+    },
+    {
+      "description": "Per-doctype excluded companies (overrides global excluded companies for specific doctypes)",
+      "fieldname": "per_doctype_excluded_companies",
+      "fieldtype": "Table",
+      "label": "Per-DocType Excluded Companies",
+      "options": "CGF Per DocType Excluded Company"
+    },
+    {
+      "fieldname": "advanced_section",
+      "fieldtype": "Section Break",
+      "label": "Advanced Settings"
+    },
+    {
+      "default": "1",
+      "description": "System Manager role can always bypass company filtering",
+      "fieldname": "bypass_for_system_manager",
+      "fieldtype": "Check",
+      "label": "Bypass for System Manager"
+    },
+    {
+      "default": "0",
+      "description": "Log all company filter applications for audit purposes",
+      "fieldname": "enable_audit_logging",
+      "fieldtype": "Check",
+      "label": "Enable Audit Logging"
+    },
+    {
+      "default": "3600",
+      "description": "Cache TTL in seconds (default: 3600 = 1 hour)",
+      "fieldname": "cache_ttl",
+      "fieldtype": "Int",
+      "label": "Cache TTL (seconds)"
+    },
+    {
+      "collapsible": 1,
+      "fieldname": "documentation_section",
+      "fieldtype": "Section Break",
+      "label": "Documentation"
+    },
+    {
+      "fieldname": "setup_instructions",
+      "fieldtype": "HTML",
+      "label": "Setup Instructions",
+      "options": "<div class=\"alert alert-info\">\n<h4>Company Global Filter Settings</h4>\n<p>Configure how company filtering is applied across your ERPNext instance.</p>\n<h5>Key Settings:</h5>\n<ul>\n<li><strong>Enable Company Filtering:</strong> Master switch to enable/disable filtering globally</li>\n<li><strong>Auto Create Fields:</strong> Automatically add custom_company fields to shared master doctypes</li>\n<li><strong>Field Placement:</strong> Choose where to place company fields in forms</li>\n<li><strong>Excluded DocTypes:</strong> List doctypes that should never be filtered</li>\n<li><strong>Excluded Roles/Users:</strong> Users with these roles or specific users can bypass filtering</li>\n<li><strong>Excluded Companies:</strong> Companies whose documents are visible to specific users/roles, bypassing company filter</li>\n<li><strong>Per-DocType Excluded Companies:</strong> Override global excluded companies for specific doctypes</li>\n</ul>\n<h5>How It Works:</h5>\n<ol>\n<li>When enabled, all doctypes with a 'company' or 'custom_company' field are automatically filtered</li>\n<li>Users only see documents belonging to their selected/default company</li>\n<li>Documents from excluded companies are visible to users/roles specified in the excluded companies configuration</li>\n<li>Per-doctype excluded companies override global excluded companies for specific doctypes</li>\n<li>Filtering applies to list views, searches, and document access</li>\n<li>System doctypes and excluded doctypes are never filtered</li>\n</ol>\n<h5>Excluded Companies:</h5>\n<ul>\n<li><strong>Global Excluded Companies:</strong> Apply to all doctypes. Documents from these companies are visible to specified users/roles.</li>\n<li><strong>Per-DocType Excluded Companies:</strong> Apply only to specific doctypes. Override global exclusions for that doctype.</li>\n<li><strong>Visibility Control:</strong> For each excluded company, specify which users or roles can see documents from that company.</li>\n<li><strong>Use Cases:</strong> Shared/global companies, master data companies, or companies that need cross-company visibility.</li>\n</ul>\n<p><strong>Note:</strong> Changes to these settings may require clearing cache or restarting the server.</p>\n</div>"
+    }
+  ],
+  "index_web_pages_for_search": 0,
+  "issingle": 1,
+  "links": [],
+  "modified": "2025-01-15 12:00:00",
+  "modified_by": "Administrator",
+  "module": "Company Global Filter",
+  "name": "Company Global Filter Settings",
+  "owner": "Administrator",
+  "permissions": [
+    {
+      "create": 1,
+      "email": 1,
+      "print": 1,
+      "read": 1,
+      "role": "System Manager",
+      "share": 1,
+      "write": 1
+    }
+  ],
+  "row_format": "Dynamic",
+  "sort_field": "modified",
+  "sort_order": "DESC",
+  "states": [],
+  "track_changes": 1
+}

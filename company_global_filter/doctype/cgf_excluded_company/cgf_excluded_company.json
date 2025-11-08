@@ -1,0 +1,50 @@
+{
+ "actions": [],
+ "creation": "2025-01-15 12:00:00",
+ "doctype": "DocType",
+ "document_type": "Other",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "excluded_company",
+  "visible_to_users",
+  "visible_to_roles"
+ ],
+ "fields": [
+  {
+   "fieldname": "excluded_company",
+   "fieldtype": "Link",
+   "in_list_view": 1,
+   "label": "Company",
+   "options": "Company",
+   "reqd": 1
+  },
+  {
+   "fieldname": "visible_to_users",
+   "fieldtype": "Table",
+   "label": "Visible to Users",
+   "options": "CGF Excluded Company User"
+  },
+  {
+   "fieldname": "visible_to_roles",
+   "fieldtype": "Table",
+   "label": "Visible to Roles",
+   "options": "CGF Excluded Company Role"
+  }
+ ],
+ "index_web_pages_for_search": 0,
+ "istable": 1,
+ "links": [],
+ "modified": "2025-01-15 12:00:00",
+ "modified_by": "Administrator",
+ "module": "Company Global Filter",
+ "name": "CGF Excluded Company",
+ "owner": "Administrator",
+ "permissions": [],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": [],
+ "track_changes": 0
+}
+
